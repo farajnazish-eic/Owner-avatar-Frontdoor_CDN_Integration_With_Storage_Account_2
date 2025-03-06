@@ -1,4 +1,4 @@
-resource_group_name                           = "sa1_test_eic_FarajAnsari"
+resource_group_name                           = "xxxxxxxxxxxxxxxxxxx"
 azurerm_cdn_frontdoor_profile                 = "FarazFrontdoorProfile"
 frontdoor_profile_sku_name                    = "Premium_AzureFrontDoor"
 frontdoor_origin_name                         = "default-origin"
