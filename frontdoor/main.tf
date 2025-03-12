@@ -5,7 +5,7 @@ resource "azurerm_cdn_frontdoor_profile" "example" {
   sku_name                 = var.frontdoor_profile_sku_name
   tags                     = var.tags
 }
-
+ 
 resource "azurerm_cdn_frontdoor_origin" "example" {
   cdn_frontdoor_origin_group_id  = azurerm_cdn_frontdoor_origin_group.example.id
   certificate_name_check_enabled = var.certificate_name_check_enabled
@@ -43,12 +43,13 @@ resource "azurerm_cdn_frontdoor_origin_group" "example" {
     successful_samples_required        = var.origin_group_health_successful_samples_required
   }
 }
-
+ 
 resource "azurerm_cdn_frontdoor_endpoint" "example" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.example.id
   enabled                  = var.frontdoor_endpoint_enabled
   name                     = var.frontdoor_endpoint_name
 }
+ 
 
 resource "azurerm_cdn_frontdoor_route" "example" {
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.example.id]
