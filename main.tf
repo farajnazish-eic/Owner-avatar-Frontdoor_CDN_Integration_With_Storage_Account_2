@@ -1,6 +1,8 @@
 module "storage_account" {
-  resource_group_name = var.resource_group_name
   source = "./storage_account"
+  resource_group_name = var.resource_group_name
+  private_endpoint_id = module.frontdoor.frontdoor_private_endpoint_id
+  private_endpoint_connection_name = module.frontdoor.frontdoor_private_endpoint_name
 }
 
 module "frontdoor" {

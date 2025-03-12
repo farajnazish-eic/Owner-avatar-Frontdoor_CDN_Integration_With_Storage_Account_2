@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    azapi = {
+      source = "azure/azapi"
+    }
+  }
+}
+
 resource "azurerm_storage_account" "example" {
   access_tier                       = var.storage_account_access_tier
   account_kind                      = var.storage_account_account_kind
@@ -68,5 +76,25 @@ resource "azurerm_storage_account" "example" {
   static_website {
     error_404_document = null
     index_document     = "index.html"
+  }
+}
+
+data "azapi_resource_list" "private_endpoint_connections" {
+  type      = "Microsoft.Storage/storageAccounts/privateEndpointConnections@2022-09-01"
+  parent_id = azurerm_storage_account.example.id
+}
+
+resource "azapi_update_resource" "approval" {
+  type      = "Microsoft.Storage/storageAccounts/privateEndpointConnections@2022-09-01"
+  name      = lookup(data.azapi_resource_list.private_endpoint_connections.output.value[0], "name")
+  parent_id = azurerm_storage_account.example.id
+
+  body = {
+    properties = {
+      privateLinkServiceConnectionState = {
+        description = "Faraz Frontdoor Request Message"
+        status      = "Approved"
+      }
+    }
   }
 }
