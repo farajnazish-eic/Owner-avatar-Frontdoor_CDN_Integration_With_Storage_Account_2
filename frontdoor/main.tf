@@ -5,7 +5,7 @@ resource "azurerm_cdn_frontdoor_profile" "example" {
   sku_name                 = var.frontdoor_profile_sku_name
   tags                     = var.tags
 }
- 
+
 resource "azurerm_cdn_frontdoor_origin" "example" {
   cdn_frontdoor_origin_group_id  = azurerm_cdn_frontdoor_origin_group.example.id
   certificate_name_check_enabled = var.certificate_name_check_enabled
@@ -43,13 +43,12 @@ resource "azurerm_cdn_frontdoor_origin_group" "example" {
     successful_samples_required        = var.origin_group_health_successful_samples_required
   }
 }
- 
+
 resource "azurerm_cdn_frontdoor_endpoint" "example" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.example.id
   enabled                  = var.frontdoor_endpoint_enabled
   name                     = var.frontdoor_endpoint_name
 }
- 
 
 resource "azurerm_cdn_frontdoor_route" "example" {
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.example.id]
@@ -68,3 +67,13 @@ resource "azurerm_cdn_frontdoor_route" "example" {
     query_string_caching_behavior = var.frontdoor_route_query_string_caching_behavior
   }
 }
+
+# resource "azurerm_cdn_frontdoor_custom_domain" "main" {
+#   name                     = var.cdn_profile_name
+#   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.example.id
+#   dns_zone_id              = var.dns_zone_id
+#   host_name                = var.frontdoor_custom_domain_host_name
+#   tls {
+#       certificate_type        = var.certificate_type
+#     }
+#   }
