@@ -1,3 +1,10 @@
+terraform {
+  required_providers {
+    azapi = {
+      source = "Azure/azapi"
+    }
+  }
+}
 resource "azurerm_storage_account" "example" {
   access_tier                       = var.storage_account_access_tier
   account_kind                      = var.storage_account_account_kind
@@ -30,22 +37,17 @@ resource "azurerm_storage_account" "example" {
     container_delete_retention_policy {
       days = var.container_delete_retention_policy_days
     }
-
     delete_retention_policy {
       days                     = var.container_delete_retention_policy_days
       permanent_delete_enabled = var.storage_account_blob_permanent_delete_enabled
     }
   }
- 
   network_rules {
     bypass = [
       "AzureServices",
     ]
-
     default_action = var.storage_account_blob_default_action
   }
- 
-
   queue_properties {
     hour_metrics {
       enabled               = var.storage_account_blob_hour_metrics_enabled
@@ -53,30 +55,60 @@ resource "azurerm_storage_account" "example" {
       retention_policy_days = var.storage_account_blob_retention_policy_days
       version               = var.storage_account_blob_version
     }
- 
     logging {
       delete  = var.storage_account_blob_logging_delete
       read    = var.storage_account_blob_logging_read
       version = var.storage_account_logging_version
       write   = var.storage_account_logging_write
     }
- 
-
     minute_metrics {
       enabled      = var.minute_metrics_enabled
       include_apis = var.minute_metrics_include_apis
       version      = var.minute_metrics_version
     }
   }
- 
   share_properties {
     retention_policy {
       days = var.share_properties_retention_policy_days
     }
   }
- 
   static_website {
     error_404_document = null
     index_document     = "index.html"
   }
 }
+
+data "azapi_resource" "example_storage" {
+  type                   = "Microsoft.Storage/storageAccounts@2022-09-01"
+  resource_id            = azurerm_storage_account.example.id
+  response_export_values = ["properties.privateEndpointConnections"]
+}
+
+# Retrieve the private endpoint connection name from the storage account based on the private endpoint name
+# locals {
+#   private_endpoint_connection_name = element([
+#     for connection in data.azapi_resource.example_storage.output.properties.privateEndpointConnections
+#     : connection.name
+#   ], 0)
+# }
+
+
+# resource "azapi_update_resource" "approval" {
+#   for_each = { for connection in data.azapi_resource.example_storage.output.properties.privateEndpointConnections
+#     : connection.name => connection
+#     if connection.properties.privateLinkServiceConnectionState.status == "Pending"
+#   }
+
+#   type      = "Microsoft.Storage/storageAccounts/privateEndpointConnections@2022-09-01"
+#   name      = each.key
+#   parent_id = azurerm_storage_account.example.id
+
+#   body = {
+#     properties = {
+#       privateLinkServiceConnectionState = {
+#         status      = "Approved"
+#         description = "Faraz Frontdoor Request Message"
+#       }
+#     }
+#   }
+# }
