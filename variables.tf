@@ -456,7 +456,3 @@ variable "share_properties_retention_policy_days" {
   type        = number
   default     = 7
 }
-# variable "private_endpoint_connection_name" {
-#   description = "value"
-#   type        = string
-# }
