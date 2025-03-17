@@ -78,37 +78,21 @@ resource "azurerm_storage_account" "example" {
   }
 }
 
-data "azapi_resource" "example_storage" {
-  type                   = "Microsoft.Storage/storageAccounts@2022-09-01"
-  resource_id            = azurerm_storage_account.example.id
-  response_export_values = ["properties.privateEndpointConnections"]
+data "azapi_resource_list" "private_endpoint_connections" {
+  type      = "Microsoft.Storage/storageAccounts/privateEndpointConnections@2022-09-01"
+  parent_id = azurerm_storage_account.example.id
 }
 
-# Retrieve the private endpoint connection name from the storage account based on the private endpoint name
-# locals {
-#   private_endpoint_connection_name = element([
-#     for connection in data.azapi_resource.example_storage.output.properties.privateEndpointConnections
-#     : connection.name
-#   ], 0)
-# }
-
-
-# resource "azapi_update_resource" "approval" {
-#   for_each = { for connection in data.azapi_resource.example_storage.output.properties.privateEndpointConnections
-#     : connection.name => connection
-#     if connection.properties.privateLinkServiceConnectionState.status == "Pending"
-#   }
-
-#   type      = "Microsoft.Storage/storageAccounts/privateEndpointConnections@2022-09-01"
-#   name      = each.key
-#   parent_id = azurerm_storage_account.example.id
-
-#   body = {
-#     properties = {
-#       privateLinkServiceConnectionState = {
-#         status      = "Approved"
-#         description = "Faraz Frontdoor Request Message"
-#       }
-#     }
-#   }
-# }
+resource "azapi_update_resource" "approval" {
+  type      = "Microsoft.Storage/storageAccounts/privateEndpointConnections@2022-09-01"
+  name      = data.azapi_resource_list.private_endpoint_connections.output.value[0].name  # Accessing the first element
+  parent_id = azurerm_storage_account.example.id
+  body = {
+    properties = {
+      privateLinkServiceConnectionState = {
+        description = "Faraz Frontdoor Request Message"
+        status      = "Approved"
+      }
+    }
+  }
+}
