@@ -5,7 +5,7 @@
 
 module "storage_account" {
   resource_group_name = var.resource_group_name
-  source = "./storage_account"
+  source              = "./storage_account"
 }
 
 module "frontdoor" {
