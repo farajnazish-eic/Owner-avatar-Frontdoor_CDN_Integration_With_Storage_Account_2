@@ -81,6 +81,15 @@ resource "azurerm_storage_account" "example" {
 data "azapi_resource_list" "private_endpoint_connections" {
   type      = "Microsoft.Storage/storageAccounts/privateEndpointConnections@2022-09-01"
   parent_id = azurerm_storage_account.example.id
+  depends_on = [null_resource.delay]
+}
+
+
+resource "null_resource" "delay" {
+  provisioner "local-exec" {
+    command = "sleep 60"
+  }
+  depends_on = [azurerm_storage_account.example]
 }
 
 resource "azapi_update_resource" "approval" {
